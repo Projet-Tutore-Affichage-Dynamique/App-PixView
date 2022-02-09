@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const fs = require('fs');
 
 
 app.set('view engine', 'jade')
@@ -11,7 +12,17 @@ app.get('/', function (req, res) {
 })
 
 app.get('/contenu', function(req, res) {
-    res.render('README.md')
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.status(200).json({verif: true})
+    /*fs.readFile('./exemple.md', 'utf8', (err, data) => {
+        if(err){
+            res.status(500).json({error: "fs ne marche pas sa mère"});
+        } else {
+            res.status(200).json({
+                markdown: data,
+            });
+        }
+    });*/
 })
 
 app.use(express.static('public'))

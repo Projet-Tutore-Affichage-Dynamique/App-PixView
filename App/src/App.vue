@@ -28,9 +28,9 @@ export default {
 
   data () {
     return {
-      verif: Connection.data().verif,
-      token: Connection.data().token,
-      url: Connection.data().url + "/contenu",
+      verif: false,
+      token: null,
+      url: null,
       contenuMD: null,
       contenuHTML: null,
 
@@ -40,11 +40,16 @@ export default {
   },
 
   methods: {
+    isVerified(){
+      return this.verif;
+    },
+
     getMarkdown(){
       axios
-        .get(this.url + '?token=' + this.token)
+        .get(this.url)
         .then(response => {
-          this.contenuMD = response;
+          console.log(response.data.markdown);
+          this.contenuMD = response.data.markdown;
         })
         .catch(error => {
           console.log(error);
@@ -60,10 +65,10 @@ export default {
 
   },
 
-  create() {
+  created() {
     setInterval(() => {
-      if(this.verif === true) this.getMarkdown();
-    }, 30000);
+      if(this.isVerified()) this.getMarkdown();
+    }, 3000);
   }
 }
 </script>

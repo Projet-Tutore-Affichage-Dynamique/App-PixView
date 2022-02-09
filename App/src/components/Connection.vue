@@ -33,7 +33,6 @@ export default {
     return {
       loading: false,
       errored: false,
-      verif: false,
       url: "",
       token: "",
     }
@@ -42,15 +41,19 @@ export default {
   methods: {
     verifyConnection(){
       if(this.url !== "" && this.token !== ""){
-        console.log('coucou');
         axios
           .get(this.url)
           .then(response => {
             let data = response.data.verif;
-            if(data) this.verif = true;
-            console.log(this.verif);
+            if(data){
+              console.log('coucou');
+              this.$parent.verif = true;
+              this.$parent.token = this.token;
+              this.$parent.url = this.url + "/contenu";
+            }
           })
           .catch(error => {
+            console.log(error);
             this.errored = true;
           })
           .finally( () => this.loading = false );

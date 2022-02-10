@@ -7,7 +7,7 @@
     <section v-else>
       <spinner v-if="loading">Loading</spinner>
 
-      <section id="screen" v-else>{{ this.contenuHTML }}</section>
+      <section id="screen" v-else></section>
     </section>
 
   </div>
@@ -31,8 +31,7 @@ export default {
       verif: false,
       token: null,
       url: null,
-      contenuMD: null,
-      contenuHTML: null,
+      contenu: null,
 
       errored: false,
       loading: false,
@@ -40,35 +39,46 @@ export default {
   },
 
   methods: {
-    isVerified(){
-      return this.verif;
+    interval(){
+      setInterval(() => {
+        if(this.verif){
+          this.getContenu();
+          document.getElementById('screen').requestFullscreen();
+        }
+      }, 3000);
     },
 
-    getMarkdown(){
+    getContenu(){
       axios
         .get(this.url)
         .then(response => {
-          console.log(response.data.markdown);
-          this.contenuMD = response.data.markdown;
+          console.log(response.data);
+          this.contenu = response.data.contenu;
+
+          if(response.data.type === 'md') this.markdownToHtml();
+          else if(response.data.type === 'image') this.displayImage();
         })
         .catch(error => {
           console.log(error);
           this.errored = true;
         })
-        .finally( () => { this.loading = false; this.markdownToHtml(); } );
+        .finally( () => { this.loading = false; } );
+    },
+
+    displayImage(){
+      document.getElementById('screen').innerHTML = "<div id='image'><img id='img' src='https://www.freepsdbazaar.com/wp-content/uploads/2020/06/sky-replace/sky-sunset/sunset-049-freepsdbazaar.jpg' alt='image '/></div>";
+      //document.getElementById('img').requestFullscreen();
     },
 
     markdownToHtml(){
       let converter = new showdown.Converter();
-      this.contenuHTML = converter.makeHtml(this.contenuMD);
+      document.getElementById('screen').innerHTML = converter.makeHtml(this.contenu);
     },
 
   },
 
   created() {
-    setInterval(() => {
-      if(this.isVerified()) this.getMarkdown();
-    }, 3000);
+    this.interval();
   }
 }
 </script>
@@ -104,5 +114,14 @@ li {
 
 a {
   color: #42b983;
+}
+
+#image{
+  width: 100vw;
+  height: 100vh;
+}
+#img{
+  width: 100%;
+  height: 100%;
 }
 </style>
